@@ -5,14 +5,16 @@ import logo from '/logo.png'
 
 function App() {
   const [data, setData] = useState([])
+  const [name, setName] = useState("")
+  const [page, setPage] = useState("")
 
   useEffect(() => {
-    api.get(`/character`).then((response) => {
+    api.get(`/character/?page=${page}&name=${name}`).then((response) => {
       setData(response.data.results)
     }).catch((error) => {
       console.error("Deu ruim!!!", error)
     })
-  }, [])
+  }, [page,name])
   
 
   return (
@@ -20,7 +22,11 @@ function App() {
       <img className={s.logo} src={logo} alt="Logo Rick and Morty" />
       <div>
         <label>Search name</label>
-        <input type="text" placeholder='Type the name you want'/>
+        <input type="text" placeholder='Type the name you want' value={name} onChange={(e) => setName(e.target.value)}/>
+      </div>
+      <div>
+        <label>Choose page</label>
+        <input type="number" placeholder='Choose the page you want' value={page} onChange={(e) => setName(e.target.value)}/>
       </div>
       <main>
         {data.map((item, index) => {
