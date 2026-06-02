@@ -2,41 +2,40 @@ import s from './App.module.css'
 import { api } from './constants/api'
 import { useState, useEffect } from 'react'
 import logo from '/logo.png'
+import { Card } from './components/card'
 
 function App() {
   const [data, setData] = useState([])
   const [name, setName] = useState("")
-  const [page, setPage] = useState("")
+  const [page, setPage] = useState()
+  const [inputPage, setInputPage] = useState("")
 
   useEffect(() => {
-    api.get(`/character/?page=${page}&name=${name}`).then((response) => {
-      setData(response.data.results)
-    }).catch((error) => {
-      console.error("Deu ruim!!!", error)
-    })
-  }, [page,name])
+    const carrega = async () => {
+      try {
+        const response = await api.get(`/character/?page=${page}`)
+        setData(response.data.results)
+      } catch{
+        console.error("deu ruim!!!")
+      }
+    }
+      carrega()
+  }, [page])
   
 
   return (
     <>
       <img className={s.logo} src={logo} alt="Logo Rick and Morty" />
       <div>
-        <label>Search name</label>
-        <input type="text" placeholder='Type the name you want' value={name} onChange={(e) => setName(e.target.value)}/>
-      </div>
-      <div>
         <label>Choose page</label>
-        <input type="number" placeholder='Choose the page you want' value={page} onChange={(e) => setName(e.target.value)}/>
+        <input min={1} max={42} type="number" placeholder='Choose the page you want' value={inputPage} onChange={(e) => setInputPage(e.target.value)}/>
+        <button onClick={() => setPage(Number(inputPage))}>BUSCAR</button>
       </div>
       <main>
-        {data.map((item, index) => {
+        {data.map((item) => {
           return(
-            <div key={index}>
-              <img src={item.image} alt={item.name} />
-              <h4>Name: {item.name}</h4>
-              <p>Species: {item.species}</p>
-              {item.status === "Dead" ? "Status: ☠" : item.status === "Status: Alive" ? "😊" : <p>Status: {item.status}</p>}
-              <p>Origin: {item.origin.name}</p>
+            <div key={item.id}>
+              <Card nome={item.name} imagem={item.image} especie={item.species} origem={item.origin.name}/>
             </div>
           )
         })}
